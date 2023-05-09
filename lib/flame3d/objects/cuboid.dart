@@ -1,4 +1,5 @@
 import 'package:flame/extensions.dart';
+import 'package:flame_3d_testbed/flame3d/objects/atom.dart';
 import 'package:flame_3d_testbed/flame3d/objects/solid.dart';
 import 'package:flame_3d_testbed/flame3d/objects/surface.dart';
 
@@ -16,6 +17,10 @@ class Cuboid extends Solid {
   }) : transform = transform ?? Matrix4.identity();
 
   @override
+  List<Atom> get atoms {
+    return surfaces.expand((element) => element.atoms).toList();
+  }
+
   List<Surface> get surfaces {
     final width = Vector3(dimensions.x, 0, 0);
     final height = Vector3(0, dimensions.y, 0);

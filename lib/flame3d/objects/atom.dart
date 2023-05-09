@@ -15,6 +15,12 @@ class Atom {
 
   Atom(this.p0, this.p1, this.p2);
 
+  Atom.list(List<Vector3> list)
+      : assert(list.length == 3),
+        p0 = list[0],
+        p1 = list[1],
+        p2 = list[2];
+
   Vector3 get normal {
     final a = p1 - p0;
     final b = p2 - p0;
@@ -35,7 +41,7 @@ class Atom {
   }
 
   void render(Canvas c, Projections p) {
-    if (isCulled(p.camera)) {
+    if (false && isCulled(p.camera)) {
       return;
     }
 
@@ -47,11 +53,14 @@ class Atom {
     ].map((e) => toScreen(e, p)).map((e) => Offset(e.x, e.y)).toList();
     final path = Path()..addPolygon(points, true);
 
-    final luminance = normal.dot(_light);
-    final paint = BasicPalette.white.paint()
-      ..style = PaintingStyle.fill
-      ..color.brighten(-luminance / 2);
-    c.drawPath(path, paint);
+    // final luminance = (normal.dot(_light) + 1) / 2;
+    // final fill = BasicPalette.white.paint()
+    //   ..style = PaintingStyle.fill
+    //   ..color.brighten(luminance);
+    // c.drawPath(path, fill);
+
+    final stroke = BasicPalette.white.paint()..style = PaintingStyle.stroke;
+    c.drawPath(path, stroke);
   }
 
   Vector2 toScreen(Vector3 v, Projections p) {
@@ -60,5 +69,11 @@ class Atom {
       (v.x + 1) / 2 * size.x,
       (v.y + 1) / 2 * size.y,
     );
+  }
+
+  List<Atom> clip(Camera camera) {
+    final q = [this];
+    // TODO(luan): implement camera clipping
+    return q;
   }
 }

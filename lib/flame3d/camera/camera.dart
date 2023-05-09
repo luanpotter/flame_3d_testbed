@@ -2,47 +2,45 @@ import 'package:flame/extensions.dart';
 
 class Camera {
   Vector3 position;
-  Vector3 direction;
+  Vector3 initialDirection;
   Vector3 up;
+
+  final Vector3 _currentDirection;
 
   Camera({
     required this.position,
-    required this.direction,
+    required this.initialDirection,
     required this.up,
-  });
+  }) : _currentDirection = initialDirection.clone();
 
-  Vector3 get _cameraRight {
-    return (direction.cross(up))..normalize();
+  void lookAt({required double yawn, required double pitch}) {
+    _currentDirection.setFrom(initialDirection);
+    Matrix4.rotationY(yawn).transform3(_currentDirection);
+    Matrix4.rotationX(pitch).transform3(_currentDirection);
+  }
+
+  Vector3 get direction {
+    return _currentDirection.clone()..normalize();
   }
 
   Vector3 get _cameraUp {
-    return _cameraRight.cross(direction);
+    return (up - (direction * up.dot(direction)))..normalize();
   }
 
-  Matrix4 get _rotation {
-    final R = _cameraRight;
-    final U = _cameraUp;
-    final F = direction;
-    return Matrix4.columns(
-      Vector4(R.x, U.x, F.x, 0),
-      Vector4(R.y, U.y, F.y, 0),
-      Vector4(R.z, U.z, F.z, 0),
-      Vector4(0, 0, 0, 1),
-    );
-  }
-
-  Matrix4 get _translation {
-    final P = position;
-    return Matrix4.columns(
-      Vector4(1, 0, 0, P.x),
-      Vector4(0, 1, 0, P.y),
-      Vector4(0, 0, 1, P.z),
-      Vector4(0, 0, 0, 1),
-    );
+  Vector3 get right {
+    return _cameraUp.cross(direction);
   }
 
   Matrix4 get matrix {
-    return Matrix4.identity();
-    // return _translation.multiplied(_rotation)..invert();
+    final R = right;
+    final U = _cameraUp;
+    final F = direction;
+    final P = position;
+    return Matrix4.columns(
+      Vector4(R.x, R.y, R.z, 0),
+      Vector4(U.x, U.y, U.z, 0),
+      Vector4(F.x, F.y, F.z, 0),
+      Vector4(P.x, P.y, P.z, 1),
+    );
   }
 }
