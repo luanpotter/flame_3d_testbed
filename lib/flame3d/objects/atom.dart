@@ -4,9 +4,15 @@ import 'package:flame/extensions.dart';
 import 'package:flame/palette.dart';
 import 'package:flame_3d_testbed/flame3d/camera/camera.dart';
 import 'package:flame_3d_testbed/flame3d/camera/projections.dart';
+import 'package:flame_3d_testbed/flame3d/geom/plane3.dart';
 import 'package:flame_3d_testbed/utils.dart';
 
 final _light = Vector3(0, 0, -1)..normalize();
+
+final _zNearPlane = Plane3(
+  point: Vector3.zero(),
+  normal: Vector3(0, 0, 1),
+);
 
 class Atom {
   Vector3 p0;
@@ -32,11 +38,12 @@ class Atom {
     return normal.dot(cameraLook) < 0;
   }
 
-  Atom transform(Matrix4 m) {
+  Atom transform(Projections p) {
+    final m = p.matrix;
     return Atom(
-      transformVector(p0, m),
-      transformVector(p1, m),
-      transformVector(p2, m),
+      toScreen(transformVector(p0, m), p),
+      toScreen(transformVector(p1, m), p),
+      toScreen(transformVector(p2, m), p),
     );
   }
 
@@ -45,12 +52,17 @@ class Atom {
       return;
     }
 
-    final screenAtom = transform(p.matrix);
-    final points = [
-      screenAtom.p0,
-      screenAtom.p1,
-      screenAtom.p2,
-    ].map((e) => toScreen(e, p)).map((e) => Offset(e.x, e.y)).toList();
+    final clipped = clipZ(p.camera);
+    final screenAtoms = clipped.map((e) => e.transform(p));
+    for (final atom in screenAtoms) {
+      for (final clipped in atom.clipScreen(p.screenSize)) {
+        clipped._render(c, p);
+      }
+    }
+  }
+
+  void _render(Canvas c, Projections p) {
+    final points = [p0, p1, p2].map((e) => Offset(e.x, e.y)).toList();
     final path = Path()..addPolygon(points, true);
 
     // final luminance = (normal.dot(_light) + 1) / 2;
@@ -63,17 +75,52 @@ class Atom {
     c.drawPath(path, stroke);
   }
 
-  Vector2 toScreen(Vector3 v, Projections p) {
+  Vector3 toScreen(Vector3 v, Projections p) {
     final size = p.screenSize;
-    return Vector2(
+    return Vector3(
       (v.x + 1) / 2 * size.x,
       (v.y + 1) / 2 * size.y,
+      0.0,
     );
   }
 
-  List<Atom> clip(Camera camera) {
+  List<Atom> clipZ(Camera camera) {
+    return _zNearPlane.clip(this);
+  }
+
+  List<Atom> clipScreen(Vector2 screenSize) {
     final q = [this];
-    // TODO(luan): implement camera clipping
+
+    const vm = 20.0;
+    final planes = [
+      Plane3(
+        point: Vector3(0, vm, 0),
+        normal: Vector3(0, 1, 0),
+      ),
+      Plane3(
+        point: Vector3(0, screenSize.y - vm, 0),
+        normal: Vector3(0, -1, 0),
+      ),
+      Plane3(
+        point: Vector3(vm, 0, 0),
+        normal: Vector3(1, 0, 0),
+      ),
+      Plane3(
+        point: Vector3(screenSize.x - vm, 0, 0),
+        normal: Vector3(-1, 0, 0),
+      ),
+    ];
+
+    for (final plane in planes) {
+      var remaining = q.length;
+      while (remaining > 0) {
+        final test = q.removeAt(0);
+        remaining--;
+
+        q.addAll(plane.clip(test));
+      }
+    }
+
     return q;
   }
 }

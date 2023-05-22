@@ -6,8 +6,8 @@ class Plane3 {
   Vector3 point;
 
   Plane3({
-    required this.normal,
     required this.point,
+    required this.normal,
   });
 
   Vector3 intersect(Vector3 lineStart, Vector3 lineEnd) {

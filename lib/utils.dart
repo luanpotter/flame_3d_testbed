@@ -15,6 +15,12 @@ Vector3 transformVector(Vector3 i, Matrix4 m) {
   );
 }
 
+Matrix4 trt(Vector3 p, Matrix4 r) {
+  final t1 = Matrix4.translation(-p);
+  final t2 = Matrix4.translation(p);
+  return t2.multiplied(r).multiplied(t1);
+}
+
 void readArrowLikeKeysIntoVector2(
   RawKeyEvent event,
   Set<LogicalKeyboardKey> keysPressed,

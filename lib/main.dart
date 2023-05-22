@@ -40,7 +40,7 @@ class MyGame extends FlameGame
   double pitch = 0;
 
   double rotAngle = 0;
-  bool rotPaused = true;
+  bool rotPaused = false;
 
   @override
   Future<void> onLoad() async {
@@ -51,10 +51,10 @@ class MyGame extends FlameGame
           center: Vector3(0, 0, 20),
           dimensions: Vector3.all(4.0),
         ),
-        await ObjParser.parse(
-          fileName: 'objs/teapot.obj',
-          transform: Matrix4.translation(Vector3(30, 0, 20)),
-        ),
+        // await ObjParser.parse(
+        //   fileName: 'objs/teapot.obj',
+        //   transform: Matrix4.translation(Vector3(30, 0, 20)),
+        // ),
       ],
     );
     return super.onLoad();
@@ -97,6 +97,8 @@ class MyGame extends FlameGame
   @override
   void onSecondaryTapDown(TapDownInfo info) {
     super.onSecondaryTapDown(info);
+    final camera = scene.projections.camera;
+    camera.position = Vector3.zero();
     pitch = 0;
     yawn = 0;
   }
@@ -110,7 +112,7 @@ class MyGame extends FlameGame
       final delta = position - previous;
       final halfScreen = canvasSize / 2;
       pitch += delta.y / halfScreen.y * pi / 2;
-      yawn -= delta.x / halfScreen.x * pi;
+      yawn -= delta.x / halfScreen.x * pi / 20;
     }
     previousMousePos = position;
   }
