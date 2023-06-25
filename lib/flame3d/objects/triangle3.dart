@@ -7,21 +7,19 @@ import 'package:flame_3d_testbed/flame3d/camera/projections.dart';
 import 'package:flame_3d_testbed/flame3d/geom/plane3.dart';
 import 'package:flame_3d_testbed/utils.dart';
 
-final _light = Vector3(0, 0, -1)..normalize();
-
 final _zNearPlane = Plane3(
   point: Vector3.zero(),
   normal: Vector3(0, 0, 1),
 );
 
-class Atom {
+class Triangle3 {
   Vector3 p0;
   Vector3 p1;
   Vector3 p2;
 
-  Atom(this.p0, this.p1, this.p2);
+  Triangle3(this.p0, this.p1, this.p2);
 
-  Atom.list(List<Vector3> list)
+  Triangle3.list(List<Vector3> list)
       : assert(list.length == 3),
         p0 = list[0],
         p1 = list[1],
@@ -38,9 +36,9 @@ class Atom {
     return normal.dot(cameraLook) < 0;
   }
 
-  Atom transform(Projections p) {
+  Triangle3 transform(Projections p) {
     final m = p.matrix;
-    return Atom(
+    return Triangle3(
       toScreen(transformVector(p0, m), p),
       toScreen(transformVector(p1, m), p),
       toScreen(transformVector(p2, m), p),
@@ -53,9 +51,9 @@ class Atom {
     }
 
     final clipped = clipZ(p.camera);
-    final screenAtoms = clipped.map((e) => e.transform(p));
-    for (final atom in screenAtoms) {
-      for (final clipped in atom.clipScreen(p.screenSize)) {
+    final screenTriangles = clipped.map((e) => e.transform(p));
+    for (final t in screenTriangles) {
+      for (final clipped in t.clipScreen(p.screenSize)) {
         clipped._render(c, p);
       }
     }
@@ -84,11 +82,11 @@ class Atom {
     );
   }
 
-  List<Atom> clipZ(Camera camera) {
+  List<Triangle3> clipZ(Camera camera) {
     return _zNearPlane.clip(this);
   }
 
-  List<Atom> clipScreen(Vector2 screenSize) {
+  List<Triangle3> clipScreen(Vector2 screenSize) {
     final q = [this];
 
     const vm = 20.0;

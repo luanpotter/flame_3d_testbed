@@ -25,7 +25,7 @@ class Scene {
 
   void render(Canvas c) {
     for (final object in objects) {
-      object.atoms.forEach((atom) => atom.render(c, projections));
+      object.triangles.forEach((t) => t.render(c, projections));
     }
   }
 }

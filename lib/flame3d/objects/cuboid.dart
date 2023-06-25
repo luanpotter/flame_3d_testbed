@@ -1,7 +1,7 @@
 import 'package:flame/extensions.dart';
-import 'package:flame_3d_testbed/flame3d/objects/atom.dart';
 import 'package:flame_3d_testbed/flame3d/objects/solid.dart';
 import 'package:flame_3d_testbed/flame3d/objects/surface.dart';
+import 'package:flame_3d_testbed/flame3d/objects/triangle3.dart';
 
 class Cuboid extends Solid {
   Vector3 center;
@@ -17,8 +17,8 @@ class Cuboid extends Solid {
   }) : transform = transform ?? Matrix4.identity();
 
   @override
-  List<Atom> get atoms {
-    return surfaces.expand((element) => element.atoms).toList();
+  List<Triangle3> get triangles {
+    return surfaces.expand((element) => element.triangles).toList();
   }
 
   List<Surface> get surfaces {

@@ -1,7 +1,7 @@
 import 'package:flame/extensions.dart';
 import 'package:flame/flame.dart';
 import 'package:flame_3d_testbed/flame3d/obj_parser/obj.dart';
-import 'package:flame_3d_testbed/flame3d/objects/atom.dart';
+import 'package:flame_3d_testbed/flame3d/objects/triangle3.dart';
 
 class ObjParser {
   ObjParser._();
@@ -13,19 +13,19 @@ class ObjParser {
     final file = await Flame.assets.readFile(fileName);
     final lines = file.split('\n');
     final vertices = <Vector3>[];
-    final atoms = <Atom>[];
+    final triangles = <Triangle3>[];
     for (final line in lines) {
       final bits = line.split(' ');
       final head = bits.removeAt(0).trim();
       if (head == 'v') {
         vertices.add(_parseVertex(bits));
       } else if (head == 'f') {
-        atoms.add(_parseAtom(bits, vertices));
+        triangles.add(_parseTriangle(bits, vertices));
       }
     }
     return Obj(
       fileName: fileName,
-      atoms: atoms,
+      triangles: triangles,
       transform: transform,
     );
   }
@@ -35,8 +35,8 @@ class ObjParser {
     return Vector3.array(coords);
   }
 
-  static Atom _parseAtom(List<String> bits, List<Vector3> vertices) {
+  static Triangle3 _parseTriangle(List<String> bits, List<Vector3> vertices) {
     final coords = bits.map((e) => vertices[int.parse(e) - 1]).toList();
-    return Atom.list(coords);
+    return Triangle3.list(coords);
   }
 }

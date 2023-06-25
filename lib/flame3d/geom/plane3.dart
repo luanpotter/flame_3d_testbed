@@ -1,5 +1,5 @@
 import 'package:flame/extensions.dart';
-import 'package:flame_3d_testbed/flame3d/objects/atom.dart';
+import 'package:flame_3d_testbed/flame3d/objects/triangle3.dart';
 
 class Plane3 {
   Vector3 normal;
@@ -22,11 +22,11 @@ class Plane3 {
     return lineStart + lineToIntersect;
   }
 
-  List<Atom> clip(Atom atom) {
+  List<Triangle3> clip(Triangle3 t) {
     final inside = <Vector3>[];
     final outside = <Vector3>[];
 
-    final points = [atom.p0, atom.p1, atom.p2];
+    final points = [t.p0, t.p1, t.p2];
     for (final point in points) {
       if (distance(point) < 0) {
         outside.add(point);
@@ -44,7 +44,7 @@ class Plane3 {
         final p2 = intersect(outside[1], inside[0]);
 
         return [
-          Atom(p0, p1, p2),
+          Triangle3(p0, p1, p2),
         ];
       case 2:
         final p0 = inside[0];
@@ -53,11 +53,11 @@ class Plane3 {
         final p3 = intersect(outside[0], inside[1]);
 
         return [
-          Atom(p0, p2, p3),
-          Atom(p0, p3, p1),
+          Triangle3(p0, p2, p3),
+          Triangle3(p0, p3, p1),
         ];
       default: // case 3:
-        return [atom];
+        return [t];
     }
   }
 
