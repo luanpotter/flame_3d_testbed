@@ -1,9 +1,8 @@
 import 'dart:math';
 
 import 'package:flame/events.dart';
-import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
-import 'package:flame_3d_testbed/flame3d/obj_parser/obj_parser.dart';
+import 'package:flame_3d_testbed/flame3d/crosshair.dart';
 import 'package:flame_3d_testbed/flame3d/objects/cuboid.dart';
 import 'package:flame_3d_testbed/flame3d/scene.dart';
 import 'package:flame_3d_testbed/utils.dart';
@@ -29,12 +28,14 @@ class MyGame extends FlameGame
         SecondaryTapDetector,
         MouseMovementDetector {
   static const cameraMoveSpeed = 10.0;
-  static const cameraLookSpeed = 0.1;
+  static const cameraLookSpeed = 0.4;
   static const rotSpeed = 0.1;
 
   late Scene scene;
   Vector2 move = Vector2.zero();
+  Vector2 look = Vector2.zero();
 
+  bool mouseMoveEnabled = false;
   Vector2? previousMousePos;
   double yawn = 0;
   double pitch = 0;
@@ -57,6 +58,7 @@ class MyGame extends FlameGame
         // ),
       ],
     );
+    add(Crosshair());
     return super.onLoad();
   }
 
@@ -68,10 +70,11 @@ class MyGame extends FlameGame
     camera.position += camera.direction * move.y * cameraMoveSpeed * dt;
     camera.position -= camera.right * move.x * cameraMoveSpeed * dt;
 
-    camera.lookAt(
-      yawn: yawn,
-      pitch: pitch,
-    );
+    yawn += -look.x * cameraLookSpeed * dt;
+    pitch += look.y * cameraLookSpeed * dt;
+    yawn %= tau;
+    pitch %= tau;
+    camera.lookAt(yawn: yawn, pitch: pitch);
 
     if (!rotPaused) {
       rotAngle += rotSpeed * dt;
@@ -108,7 +111,7 @@ class MyGame extends FlameGame
     super.onMouseMove(info);
     final position = info.eventPosition.game;
     final previous = previousMousePos;
-    if (previous != null) {
+    if (previous != null && mouseMoveEnabled) {
       final delta = position - previous;
       final halfScreen = canvasSize / 2;
       pitch += delta.y / halfScreen.y * pi / 2;
@@ -130,6 +133,15 @@ class MyGame extends FlameGame
       left: LogicalKeyboardKey.keyA,
       down: LogicalKeyboardKey.keyS,
       right: LogicalKeyboardKey.keyD,
+    );
+    readArrowLikeKeysIntoVector2(
+      event,
+      keysPressed,
+      look,
+      up: LogicalKeyboardKey.keyI,
+      left: LogicalKeyboardKey.keyJ,
+      down: LogicalKeyboardKey.keyK,
+      right: LogicalKeyboardKey.keyL,
     );
     return KeyEventResult.handled;
   }

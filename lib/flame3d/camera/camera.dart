@@ -1,5 +1,4 @@
 import 'package:flame/extensions.dart';
-import 'package:flame_3d_testbed/utils.dart';
 
 class Camera {
   Vector3 position;
@@ -16,8 +15,8 @@ class Camera {
 
   void lookAt({required double yawn, required double pitch}) {
     _currentDirection.setFrom(initialDirection);
-    trt(position, Matrix4.rotationY(yawn)).transform3(_currentDirection);
-    trt(position, Matrix4.rotationX(pitch)).transform3(_currentDirection);
+    Matrix4.rotationY(yawn).transform3(_currentDirection);
+    Matrix4.rotationX(pitch).transform3(_currentDirection);
   }
 
   Vector3 get direction {
