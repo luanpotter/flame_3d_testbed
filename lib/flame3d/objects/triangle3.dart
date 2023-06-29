@@ -33,25 +33,45 @@ class Triangle3 {
 
   bool isCulled(Camera camera) {
     final cameraLook = p0 - camera.position;
-    return normal.dot(cameraLook) < 0;
+    return normal.dot(cameraLook) > 0;
   }
 
-  Triangle3 transform(Projections p) {
-    final m = p.matrix;
+  Triangle3 transformProjection(Projections p) {
+    final m = p.projection.matrix;
     return Triangle3(
-      toScreen(transformVector(p0, m), p),
-      toScreen(transformVector(p1, m), p),
-      toScreen(transformVector(p2, m), p),
+      transformVector(p0, m),
+      transformVector(p1, m),
+      transformVector(p2, m),
+    );
+  }
+
+  Triangle3 transformCamera(Projections p) {
+    final m = p.camera.matrix;
+    return Triangle3(
+      transformVector(p0, m),
+      transformVector(p1, m),
+      transformVector(p2, m),
+    );
+  }
+
+  Triangle3 mapToScreen(Projections p) {
+    return Triangle3(
+      toScreen(p0, p),
+      toScreen(p1, p),
+      toScreen(p2, p),
     );
   }
 
   void render(Canvas c, Projections p) {
-    if (false && isCulled(p.camera)) {
+    final transformed = transformCamera(p);
+    if (transformed.isCulled(p.camera)) {
       return;
     }
 
-    final clipped = clipZ(p.camera);
-    final screenTriangles = clipped.map((e) => e.transform(p));
+    final transformed2 = transformed.transformProjection(p);
+
+    final clipped = transformed2.clipZ(p.camera);
+    final screenTriangles = clipped.map((e) => e.mapToScreen(p));
     for (final t in screenTriangles) {
       for (final clipped in t.clipScreen(p.screenSize)) {
         clipped._render(c, p);
@@ -83,7 +103,8 @@ class Triangle3 {
   }
 
   List<Triangle3> clipZ(Camera camera) {
-    return _zNearPlane.clip(this);
+    return [this];
+    // return _zNearPlane.clip(this);
   }
 
   List<Triangle3> clipScreen(Vector2 screenSize) {

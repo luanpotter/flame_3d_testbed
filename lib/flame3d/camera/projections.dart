@@ -12,8 +12,4 @@ class Projections {
     required this.camera,
     required this.projection,
   });
-
-  Matrix4 get matrix {
-    return projection.matrix.multiplied(camera.matrix);
-  }
 }
