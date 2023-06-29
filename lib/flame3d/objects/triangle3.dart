@@ -30,8 +30,7 @@ class Triangle3 {
     return a.cross(b)..normalize();
   }
 
-  Triangle3 transformProjection(Projections p) {
-    final m = p.projection.matrix;
+  Triangle3 transform(Matrix4 m) {
     return Triangle3(
       transformVector(p0, m),
       transformVector(p1, m),
@@ -39,13 +38,12 @@ class Triangle3 {
     );
   }
 
+  Triangle3 transformProjection(Projections p) {
+    return transform(p.projection.matrix);
+  }
+
   Triangle3 transformCamera(Projections p) {
-    final m = p.camera.matrix;
-    return Triangle3(
-      transformVector(p0, m),
-      transformVector(p1, m),
-      transformVector(p2, m),
-    );
+    return transform(p.camera.matrix);
   }
 
   Triangle3 mapToScreen(Projections p) {

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame_3d_testbed/flame3d/crosshair.dart';
+import 'package:flame_3d_testbed/flame3d/obj_parser/obj_parser.dart';
 import 'package:flame_3d_testbed/flame3d/objects/cuboid.dart';
 import 'package:flame_3d_testbed/flame3d/scene.dart';
 import 'package:flame_3d_testbed/utils.dart';
@@ -52,10 +53,10 @@ class MyGame extends FlameGame
           center: Vector3(0, 0, 20),
           dimensions: Vector3.all(4.0),
         ),
-        // await ObjParser.parse(
-        //   fileName: 'objs/teapot.obj',
-        //   transform: Matrix4.translation(Vector3(30, 0, 20)),
-        // ),
+        await ObjParser.parse(
+          fileName: 'objs/teapot.obj',
+          transform: Matrix4.translation(Vector3(30, 0, 20)),
+        ),
       ],
     );
     add(Crosshair());
