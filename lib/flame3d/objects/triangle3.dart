@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:flame/extensions.dart';
 import 'package:flame/palette.dart';
-import 'package:flame_3d_testbed/flame3d/camera/camera.dart';
 import 'package:flame_3d_testbed/flame3d/camera/perspective_projection.dart';
 import 'package:flame_3d_testbed/flame3d/camera/projections.dart';
 import 'package:flame_3d_testbed/flame3d/geom/plane3.dart';
