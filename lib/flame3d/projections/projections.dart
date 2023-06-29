@@ -1,6 +1,6 @@
 import 'package:flame/extensions.dart';
-import 'package:flame_3d_testbed/flame3d/camera/camera.dart';
-import 'package:flame_3d_testbed/flame3d/camera/perspective_projection.dart';
+import 'package:flame_3d_testbed/flame3d/projections/camera.dart';
+import 'package:flame_3d_testbed/flame3d/projections/perspective_projection.dart';
 
 class Projections {
   Vector2 screenSize;

@@ -2,9 +2,9 @@ import 'dart:ui';
 
 import 'package:flame/extensions.dart';
 import 'package:flame/palette.dart';
-import 'package:flame_3d_testbed/flame3d/camera/perspective_projection.dart';
-import 'package:flame_3d_testbed/flame3d/camera/projections.dart';
 import 'package:flame_3d_testbed/flame3d/geom/plane3.dart';
+import 'package:flame_3d_testbed/flame3d/projections/perspective_projection.dart';
+import 'package:flame_3d_testbed/flame3d/projections/projections.dart';
 import 'package:flame_3d_testbed/utils.dart';
 
 final _stroke = BasicPalette.white.paint()..style = PaintingStyle.stroke;
