@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flame/extensions.dart';
+import 'package:flame_3d_testbed/flame3d/geom/plane3.dart';
 
 class PerspectiveProjection {
   Vector2 screenSize;
@@ -23,7 +24,12 @@ class PerspectiveProjection {
       Vector4(a * f, 0, 0, 0),
       Vector4(0, f, 0, 0),
       Vector4(0, 0, q, 1),
-      Vector4(0, 0, -zFar * q, 0),
+      Vector4(0, 0, -zNear * q, 0),
     );
   }
+
+  Plane3 get zNearPlane => Plane3(
+        point: Vector3(0, 0, zNear),
+        normal: Vector3(0, 0, 1),
+      );
 }

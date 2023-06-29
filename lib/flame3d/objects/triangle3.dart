@@ -3,14 +3,12 @@ import 'dart:ui';
 import 'package:flame/extensions.dart';
 import 'package:flame/palette.dart';
 import 'package:flame_3d_testbed/flame3d/camera/camera.dart';
+import 'package:flame_3d_testbed/flame3d/camera/perspective_projection.dart';
 import 'package:flame_3d_testbed/flame3d/camera/projections.dart';
 import 'package:flame_3d_testbed/flame3d/geom/plane3.dart';
 import 'package:flame_3d_testbed/utils.dart';
 
-final _zNearPlane = Plane3(
-  point: Vector3.zero(),
-  normal: Vector3(0, 0, 1),
-);
+final _stroke = BasicPalette.white.paint()..style = PaintingStyle.stroke;
 
 class Triangle3 {
   Vector3 p0;
@@ -25,15 +23,12 @@ class Triangle3 {
         p1 = list[1],
         p2 = list[2];
 
-  Vector3 get normal {
+  Vector3 get normal => normal0;
+
+  Vector3 get normal0 {
     final a = p1 - p0;
     final b = p2 - p0;
     return a.cross(b)..normalize();
-  }
-
-  bool isCulled(Camera camera) {
-    final cameraLook = p0 - camera.position;
-    return normal.dot(cameraLook) > 0;
   }
 
   Triangle3 transformProjection(Projections p) {
@@ -63,34 +58,20 @@ class Triangle3 {
   }
 
   void render(Canvas c, Projections p) {
-    final transformed = transformCamera(p);
-    if (transformed.isCulled(p.camera)) {
-      return;
-    }
-
-    final transformed2 = transformed.transformProjection(p);
-
-    final clipped = transformed2.clipZ(p.camera);
-    final screenTriangles = clipped.map((e) => e.mapToScreen(p));
-    for (final t in screenTriangles) {
-      for (final clipped in t.clipScreen(p.screenSize)) {
-        clipped._render(c, p);
-      }
-    }
+    transformCamera(p)
+        .clipZNear(p.projection)
+        .map((t) => t.transformProjection(p))
+        .map((t) => t.mapToScreen(p))
+        .expand((t) => t.clipScreen(p.screenSize))
+        .forEach((t) => t._render(c));
   }
 
-  void _render(Canvas c, Projections p) {
-    final points = [p0, p1, p2].map((e) => Offset(e.x, e.y)).toList();
+  void _render(Canvas c) {
+    final points =
+        [p0, p1, p2].map((e) => Offset(e.x, e.y)).toList(growable: false);
     final path = Path()..addPolygon(points, true);
 
-    // final luminance = (normal.dot(_light) + 1) / 2;
-    // final fill = BasicPalette.white.paint()
-    //   ..style = PaintingStyle.fill
-    //   ..color.brighten(luminance);
-    // c.drawPath(path, fill);
-
-    final stroke = BasicPalette.white.paint()..style = PaintingStyle.stroke;
-    c.drawPath(path, stroke);
+    c.drawPath(path, _stroke);
   }
 
   Vector3 toScreen(Vector3 v, Projections p) {
@@ -102,9 +83,8 @@ class Triangle3 {
     );
   }
 
-  List<Triangle3> clipZ(Camera camera) {
-    return [this];
-    // return _zNearPlane.clip(this);
+  List<Triangle3> clipZNear(PerspectiveProjection projection) {
+    return projection.zNearPlane.clip(this);
   }
 
   List<Triangle3> clipScreen(Vector2 screenSize) {

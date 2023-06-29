@@ -28,7 +28,7 @@ class MyGame extends FlameGame
         SecondaryTapDetector,
         MouseMovementDetector {
   static const cameraMoveSpeed = 10.0;
-  static const cameraLookSpeed = 0.4;
+  static const cameraLookSpeed = 0.8;
   static const rotSpeed = 0.1;
 
   late Scene scene;
@@ -67,11 +67,11 @@ class MyGame extends FlameGame
     super.update(dt);
 
     final camera = scene.projections.camera;
-    camera.position += camera.direction * move.y * cameraMoveSpeed * dt;
-    camera.position -= camera.right * move.x * cameraMoveSpeed * dt;
+    camera.position -= camera.direction * move.y * cameraMoveSpeed * dt;
+    camera.position += camera.right * move.x * cameraMoveSpeed * dt;
 
-    yawn += -look.x * cameraLookSpeed * dt;
-    pitch += look.y * cameraLookSpeed * dt;
+    yawn += look.x * cameraLookSpeed * dt;
+    pitch -= look.y * cameraLookSpeed * dt;
     yawn %= tau;
     pitch %= tau;
     camera.lookAt(yawn: yawn, pitch: pitch);

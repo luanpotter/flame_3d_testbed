@@ -31,7 +31,7 @@ class Camera {
     return _cameraUp.cross(direction);
   }
 
-  Matrix4 get matrix {
+  Matrix4 get _pointAt {
     final R = right;
     final U = _cameraUp;
     final F = direction;
@@ -42,5 +42,9 @@ class Camera {
       Vector4(F.x, F.y, F.z, 0),
       Vector4(P.x, P.y, P.z, 1),
     );
+  }
+
+  Matrix4 get matrix {
+    return _pointAt.clone()..invert();
   }
 }
