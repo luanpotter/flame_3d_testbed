@@ -8,7 +8,7 @@ class ObjParser {
 
   static Future<Obj> parse({
     required String fileName,
-    required Matrix4 transform,
+    Matrix4? transform,
   }) async {
     final file = await Flame.assets.readFile(fileName);
     final lines = file.split('\n');
