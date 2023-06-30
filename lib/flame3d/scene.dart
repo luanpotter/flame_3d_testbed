@@ -12,7 +12,6 @@ class Scene {
     required Vector2 screenSize,
     required this.objects,
   }) : projections = Projections(
-          screenSize: screenSize,
           camera: Camera(
             position: Vector3.zero(),
             initialDirection: Vector3(0, 0, 1),
@@ -29,5 +28,10 @@ class Scene {
           .map((e) => e.transform(object.transform))
           .forEach((t) => t.render(c, projections));
     }
+  }
+
+  Vector2 get screenSize => projections.projection.screenSize;
+  set screenSize(Vector2 value) {
+    projections.projection.screenSize = value;
   }
 }

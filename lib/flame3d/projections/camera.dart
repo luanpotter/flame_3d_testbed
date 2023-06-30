@@ -14,10 +14,15 @@ class Camera {
     required this.up,
   }) : currentDirection = initialDirection.clone();
 
-  void lookAt({required double yawn, required double pitch}) {
+  void lookAt({required double yaw, required double pitch}) {
     currentDirection.setFrom(initialDirection);
-    Matrix4.rotationY(yawn).transform3(currentDirection);
-    Matrix4.rotationX(pitch).transform3(currentDirection);
+
+    final rotation = Matrix4.rotationY(yaw);
+    rotation.rotate(right, pitch);
+    rotation.transform3(currentDirection);
+
+    final newRight = up.cross(currentDirection);
+    up.setFrom(currentDirection.cross(newRight));
   }
 
   Vector3 get direction {

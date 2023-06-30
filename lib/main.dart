@@ -5,9 +5,10 @@ import 'package:flame/game.dart';
 import 'package:flame_3d_testbed/flame3d/crosshair.dart';
 import 'package:flame_3d_testbed/flame3d/obj_parser/obj_parser.dart';
 import 'package:flame_3d_testbed/flame3d/objects/cuboid.dart';
+import 'package:flame_3d_testbed/flame3d/overlay.dart';
 import 'package:flame_3d_testbed/flame3d/scene.dart';
 import 'package:flame_3d_testbed/utils.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Overlay;
 import 'package:flutter/services.dart';
 
 void main() {
@@ -32,13 +33,13 @@ class MyGame extends FlameGame
   static const cameraLookSpeed = 0.8;
   static const rotSpeed = 0.1;
 
-  late Scene scene;
+  Scene? scene;
   Vector2 move = Vector2.zero();
   Vector2 look = Vector2.zero();
 
   bool mouseMoveEnabled = false;
   Vector2? previousMousePos;
-  double yawn = 0;
+  double yaw = 0;
   double pitch = 0;
 
   double rotAngle = 0;
@@ -55,27 +56,38 @@ class MyGame extends FlameGame
         ),
         await ObjParser.parse(
           fileName: 'objs/teapot.obj',
-          transform: Matrix4.translation(Vector3(30, 0, 20)),
+          transform: Matrix4.translation(Vector3(30, -5, 20)),
         ),
       ],
     );
-    add(Crosshair());
+    await addAll([Crosshair(), Overlay()]);
     return super.onLoad();
+  }
+
+  @override
+  void onGameResize(Vector2 size) {
+    super.onGameResize(size);
+    scene?.screenSize = size;
   }
 
   @override
   void update(double dt) {
     super.update(dt);
 
+    final scene = this.scene;
+    if (scene == null) {
+      return;
+    }
+
     final camera = scene.projections.camera;
     camera.position -= camera.direction * move.y * cameraMoveSpeed * dt;
     camera.position += camera.right * move.x * cameraMoveSpeed * dt;
 
-    yawn += look.x * cameraLookSpeed * dt;
+    yaw += look.x * cameraLookSpeed * dt;
     pitch -= look.y * cameraLookSpeed * dt;
-    yawn %= tau;
+    yaw %= tau;
     pitch %= tau;
-    camera.lookAt(yawn: yawn, pitch: pitch);
+    camera.lookAt(yaw: yaw, pitch: pitch);
 
     if (!rotPaused) {
       rotAngle += rotSpeed * dt;
@@ -89,7 +101,7 @@ class MyGame extends FlameGame
   @override
   void render(Canvas c) {
     super.render(c);
-    scene.render(c);
+    scene?.render(c);
   }
 
   @override
@@ -101,10 +113,14 @@ class MyGame extends FlameGame
   @override
   void onSecondaryTapDown(TapDownInfo info) {
     super.onSecondaryTapDown(info);
+    final scene = this.scene;
+    if (scene == null) {
+      return;
+    }
     final camera = scene.projections.camera;
     camera.position.setZero();
     pitch = 0;
-    yawn = 0;
+    yaw = 0;
   }
 
   @override
@@ -116,7 +132,7 @@ class MyGame extends FlameGame
       final delta = position - previous;
       final halfScreen = canvasSize / 2;
       pitch += delta.y / halfScreen.y * pi / 2;
-      yawn -= delta.x / halfScreen.x * pi / 20;
+      yaw -= delta.x / halfScreen.x * pi / 20;
     }
     previousMousePos = position;
   }
@@ -163,4 +179,7 @@ class MyGame extends FlameGame
       return current - step.clamp(0, maxDelta);
     }
   }
+
+  Vector3 get cameraPosition =>
+      scene?.projections.camera.position ?? Vector3.zero();
 }

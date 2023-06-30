@@ -59,7 +59,7 @@ class Triangle3 {
         .clipZNear(p.projection)
         .map((t) => t.transformProjection(p))
         .map((t) => t.mapToScreen(p))
-        .expand((t) => t.clipScreen(p.screenSize))
+        .expand((t) => t.clipScreen(p.projection.screenSize))
         .forEach((t) => t._render(c));
   }
 
@@ -72,7 +72,7 @@ class Triangle3 {
   }
 
   Vector3 toScreen(Vector3 v, Projections p) {
-    final size = p.screenSize;
+    final size = p.projection.screenSize;
     return Vector3(
       (v.x + 1) / 2 * size.x,
       (v.y + 1) / 2 * size.y,
