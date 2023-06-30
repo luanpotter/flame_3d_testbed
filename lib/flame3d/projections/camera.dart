@@ -2,38 +2,39 @@ import 'package:flame/extensions.dart';
 
 class Camera {
   Vector3 position;
-  Vector3 initialDirection;
-  Vector3 up;
 
-  final Vector3 _currentDirection;
+  final Vector3 up;
+
+  final Vector3 initialDirection;
+  final Vector3 currentDirection;
 
   Camera({
     required this.position,
     required this.initialDirection,
     required this.up,
-  }) : _currentDirection = initialDirection.clone();
+  }) : currentDirection = initialDirection.clone();
 
   void lookAt({required double yawn, required double pitch}) {
-    _currentDirection.setFrom(initialDirection);
-    Matrix4.rotationY(yawn).transform3(_currentDirection);
-    Matrix4.rotationX(pitch).transform3(_currentDirection);
+    currentDirection.setFrom(initialDirection);
+    Matrix4.rotationY(yawn).transform3(currentDirection);
+    Matrix4.rotationX(pitch).transform3(currentDirection);
   }
 
   Vector3 get direction {
-    return _currentDirection.clone()..normalize();
+    return currentDirection.clone()..normalize();
   }
 
-  Vector3 get _cameraUp {
+  Vector3 get cameraUp {
     return (up - (direction * up.dot(direction)))..normalize();
   }
 
   Vector3 get right {
-    return _cameraUp.cross(direction);
+    return cameraUp.cross(direction);
   }
 
-  Matrix4 get _pointAt {
+  Matrix4 get pointAt {
     final R = right;
-    final U = _cameraUp;
+    final U = cameraUp;
     final F = direction;
     final P = position;
     return Matrix4.columns(
@@ -45,6 +46,6 @@ class Camera {
   }
 
   Matrix4 get matrix {
-    return _pointAt.clone()..invert();
+    return pointAt.clone()..invert();
   }
 }

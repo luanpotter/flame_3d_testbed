@@ -102,7 +102,7 @@ class MyGame extends FlameGame
   void onSecondaryTapDown(TapDownInfo info) {
     super.onSecondaryTapDown(info);
     final camera = scene.projections.camera;
-    camera.position = Vector3.zero();
+    camera.position.setZero();
     pitch = 0;
     yawn = 0;
   }
