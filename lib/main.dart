@@ -86,7 +86,7 @@ class MyGame extends FlameGame
     yaw += look.x * cameraLookSpeed * dt;
     pitch -= look.y * cameraLookSpeed * dt;
     yaw %= tau;
-    pitch %= tau;
+    pitch = pitch.clamp(-pi / 2 + 0.01, pi / 2 - 0.01);
     camera.lookAt(yaw: yaw, pitch: pitch);
 
     if (!rotPaused) {

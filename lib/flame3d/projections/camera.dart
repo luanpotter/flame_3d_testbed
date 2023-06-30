@@ -20,9 +20,6 @@ class Camera {
     final rotation = Matrix4.rotationY(yaw);
     rotation.rotate(right, pitch);
     rotation.transform3(currentDirection);
-
-    final newRight = up.cross(currentDirection);
-    up.setFrom(currentDirection.cross(newRight));
   }
 
   Vector3 get direction {
