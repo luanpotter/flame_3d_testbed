@@ -54,16 +54,15 @@ class Triangle3 {
     );
   }
 
-  void render(Canvas c, Projections p) {
-    transformCamera(p)
+  Iterable<Triangle3> project(Projections p) {
+    return transformCamera(p)
         .clipZNear(p.projection)
         .map((t) => t.transformProjection(p))
         .map((t) => t.mapToScreen(p))
-        .expand((t) => t.clipScreen(p.projection.screenSize))
-        .forEach((t) => t._render(c));
+        .expand((t) => t.clipScreen(p.projection.screenSize));
   }
 
-  void _render(Canvas c) {
+  void render(Canvas c) {
     final points =
         [p0, p1, p2].map((e) => Offset(e.x, e.y)).toList(growable: false);
     final path = Path()..addPolygon(points, true);
