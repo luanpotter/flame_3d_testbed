@@ -58,6 +58,10 @@ class MyGame extends FlameGame
           fileName: 'objs/teapot.obj',
           transform: Matrix4.translation(Vector3(30, -5, 20)),
         ),
+        await ObjParser.parse(
+          fileName: 'objs/sphere.obj',
+          transform: Matrix4.translation(Vector3(-30, -5, 20)),
+        ),
       ],
     );
     await addAll([Crosshair(), Overlay()]);
